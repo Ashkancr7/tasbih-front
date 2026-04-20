@@ -1,107 +1,129 @@
 "use client";
 
+import { memo, useMemo } from "react";
 import Image from "next/image";
-import { ShoppingCart, Heart, Star, ShieldCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+import { ShoppingCart, Heart, Star, ShieldCheck } from "lucide-react";
 import { useCartStore } from "../store/cartStore";
-export default function ProductCard({ product }) {
-  // تابع کمکی برای فرمت قیمت (می‌تواند به یک فایل Utils منتقل شود)
-  const formatPrice = (price) => {
-    return new Intl.NumberFormat("fa-IR").format(price);
+
+// --- Utilities ---
+const formatCurrency = (value) => {
+  return new Intl.NumberFormat("fa-IR").format(value);
+};
+
+const ProductCard = memo(({ product }) => {
+  const router = useRouter();
+  const addToCart = useCartStore((state) => state.addToCart);
+
+  // بهینه‌سازی محاسبات قیمت
+  const formattedPrice = useMemo(() => formatCurrency(product.price), [product.price]);
+  const formattedOldPrice = useMemo(() => 
+    product.oldPrice ? formatCurrency(product.oldPrice) : null, 
+    [product.oldPrice]
+  );
+
+  const handleNavigation = () => {
+    router.push(`/product/${product.id}`);
   };
 
-  const addToCart = useCartStore((state) => state.addToCart);
-  const router = useRouter();
+  const handleQuickAdd = (e) => {
+    e.stopPropagation(); // جلوگیری از اجرای کلیک روی کارت
+    addToCart(product);
+  };
 
   return (
     <motion.div
-      onClick={() => router.push(`/product/${product.id}`)}
-      whileHover={{ y: -8 }}
-      className="group relative bg-white rounded-[2.5rem] p-3 shadow-sm hover:shadow-[0_20px_50px_rgba(0,0,0,0.05)] transition-all duration-500 border border-gray-100/50"
+      layout
+      onClick={handleNavigation}
+      whileHover={{ y: -10 }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
+      className="group cursor-pointer relative bg-white rounded-[2.5rem] p-3 shadow-sm hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.08)] transition-all duration-500 border border-gray-100"
     >
-      {/* --- اکشن‌های سریع (Quick Actions) --- */}
-      <div className="absolute top-6 left-6 z-10 flex flex-col gap-2">
-        <button className="p-2.5 bg-white/80 backdrop-blur-md rounded-full shadow-sm text-gray-400 hover:text-red-500 hover:bg-white transition-all">
-          <Heart
-            size={18}
-            fill="currentColor"
-            className="fill-transparent hover:fill-red-500"
-          />
+      {/* --- Actions --- */}
+      <div className="absolute top-6 left-6 z-20 flex flex-col gap-2">
+        <button 
+          aria-label="Add to wishlist"
+          className="p-2.5 bg-white/90 backdrop-blur-md rounded-full shadow-sm text-gray-400 hover:text-red-500 hover:bg-white transition-all active:scale-90"
+        >
+          <Heart size={18} className="transition-colors" />
         </button>
       </div>
 
-      {/* --- بخش تصویر --- */}
+      {/* --- Media Section --- */}
       <div className="relative aspect-square overflow-hidden rounded-[2rem] bg-gray-50">
         {product.discount && (
-          <span className="absolute top-4 right-4 z-10 bg-red-500 text-white text-[10px] font-bold px-3 py-1 rounded-full">
+          <div className="absolute top-4 right-4 z-10 bg-red-500 text-white text-[11px] font-bold px-3 py-1 rounded-full shadow-lg shadow-red-200">
             ویژه
-          </span>
+          </div>
         )}
 
-        <img
+        <Image
           src={product.image}
           alt={product.name}
-          className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-out"
+          fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          className="object-cover transform group-hover:scale-105 transition-transform duration-700 ease-in-out"
+          priority={false}
         />
-
-        {/* Overlay هنگام هوور */}
-        <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+        
+        <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
       </div>
 
-      {/* --- محتوای کارت --- */}
-      <div className="p-4 space-y-3">
+      {/* --- Content Section --- */}
+      <div className="p-4 space-y-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1 text-yellow-500">
+          <div className="flex items-center gap-1 text-amber-500">
             <Star size={14} fill="currentColor" />
-            <span className="text-xs font-medium text-gray-500">۴.۸</span>
+            <span className="text-xs font-bold text-gray-600">{product.rating || "۴.۸"}</span>
           </div>
-          <div className="flex items-center gap-1 text-green-600">
-            <span className="text-[10px] font-medium">اصالت سنگ</span>
+          <div className="flex items-center gap-1.5 text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-lg">
+            <span className="text-[10px] font-bold">اصالت سنگ</span>
             <ShieldCheck size={14} />
           </div>
         </div>
 
-        <h3 className="text-lg font-extrabold text-gray-800 text-right group-hover:text-green-700 transition-colors line-clamp-1">
-          {product.name}
-        </h3>
+        <div className="space-y-1 text-right">
+          <h3 className="text-lg font-black text-gray-800 group-hover:text-emerald-600 transition-colors line-clamp-1">
+            {product.name}
+          </h3>
+          <p className="text-xs text-gray-400 leading-relaxed line-clamp-2 min-h-[3rem]">
+            {product.description || "توضیحی برای این محصول وارد نشده است."}
+          </p>
+        </div>
 
-        <p className="text-xs text-gray-400 text-right leading-5 line-clamp-2 min-h-[40px]">
-          {product.description}
-        </p>
-
-        {/* --- بخش قیمت و خرید --- */}
-        <div className="flex items-center justify-between pt-2 border-t border-gray-50">
-          <div className="text-right">
-            <p className="text-[10px] text-gray-400 line-through leading-none mb-1">
-              {product.oldPrice ? formatPrice(product.oldPrice) : ""}
-            </p>
+        {/* --- Footer / Pricing --- */}
+        <div className="flex items-center justify-between pt-3 border-t border-gray-50">
+          <div className="flex flex-col items-end">
+            {formattedOldPrice && (
+              <span className="text-[11px] text-gray-400 line-through decoration-red-400/50">
+                {formattedOldPrice}
+              </span>
+            )}
             <div className="flex items-center gap-1">
-              <span className="text-xl font-black text-gray-900">
-                {formatPrice(product.price)}
+              <span className="text-xl font-black text-gray-900 tracking-tighter">
+                {formattedPrice}
               </span>
               <span className="text-[10px] font-bold text-gray-500">تومان</span>
             </div>
           </div>
 
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              addToCart(product);
-            }}
-            className="relative flex items-center justify-center w-12 h-12 bg-gray-900 text-white rounded-2xl hover:bg-green-600 hover:shadow-[0_10px_20px_rgba(22,163,74,0.3)] transition-all duration-300 group/btn"
+            onClick={handleQuickAdd}
+            aria-label="Quick add to cart"
+            className="group/btn relative flex items-center justify-center w-12 h-12 bg-gray-900 text-white rounded-2xl hover:bg-emerald-600 transition-all duration-300 shadow-xl shadow-gray-200 hover:shadow-emerald-200"
           >
-            <ShoppingCart
-              size={20}
-              className="group-hover/btn:scale-110 transition-transform"
-            />
-            {/* Tooltip کوچک برای دکمه */}
-            <span className="absolute -top-10 bg-gray-800 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover/btn:opacity-100 transition-opacity whitespace-nowrap">
-              افزودن سریع
+            <ShoppingCart size={20} className="group-hover/btn:scale-110 transition-transform" />
+            <span className="absolute -top-10 scale-0 group-hover/btn:scale-100 bg-gray-800 text-white text-[10px] px-2 py-1 rounded-md transition-all origin-bottom">
+              خرید سریع
             </span>
           </button>
         </div>
       </div>
     </motion.div>
   );
-}
+});
+
+ProductCard.displayName = "ProductCard";
+
+export default ProductCard;
