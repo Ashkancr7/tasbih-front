@@ -1,6 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
+// ۱. اضافه کردن Variants به ایمپورت‌ها
+import { motion, Variants } from "framer-motion";
 import { ArrowLeft, Diamond, Truck, Hammer } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -9,8 +10,19 @@ import HeroSection from "../components/HeroSection";
 import ProductCard from "../components/ProductCard";
 import Footer from '../components/Footer';
 
-// ۱. دیتاها رو معمولاً در یک فایل ثابت (Constants) یا خروجی API نگه می‌داریم
-const PRODUCTS = [
+// تعریف تایپ برای محصولات (برای تمیزی بیشتر)
+interface Product {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  oldPrice?: number;
+  discount?: boolean;
+  rating: number;
+  image: string;
+}
+
+const PRODUCTS: Product[] = [
   {
     id: 1,
     name: "تسبیح عقیق یمنی اصل",
@@ -39,26 +51,8 @@ const PRODUCTS = [
   },
 ];
 
-const FEATURES = [
-  {
-    title: "اصالت تضمینی",
-    desc: "ارائه شناسنامه معتبر برای تمامی سنگ‌ها",
-    icon: <Diamond className="text-emerald-400" size={32} />,
-  },
-  {
-    title: "ارسال اکسپرس",
-    desc: "بسته‌بندی نفیس و ارسال در کمتر از ۴۸ ساعت",
-    icon: <Truck className="text-emerald-400" size={32} />,
-  },
-  {
-    title: "ساخت سفارشی",
-    desc: "تغییر دانه و منجوق طبق سلیقه شما",
-    icon: <Hammer className="text-emerald-400" size={32} />,
-  },
-];
-
-// انیمیشن‌های کانتینر
-const containerVariants = {
+// ۲. اضافه کردن تایپ Variants به متغیرها برای حل ارور
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -66,19 +60,16 @@ const containerVariants = {
   },
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: { y: 20, opacity: 0 },
   visible: { y: 0, opacity: 1, transition: { duration: 0.5, ease: "easeOut" } },
 };
 
 export default function Home() {
-
   const router = useRouter();
-
 
   return (
     <div className="bg-[#020617] min-h-screen text-white selection:bg-emerald-500/30 overflow-x-hidden">
-      {/* افکت نوری پس‌زمینه برای عمق دادن به صفحه */}
       <div className="fixed top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-emerald-500/10 blur-[120px] pointer-events-none z-0" />
 
       <Navbar />
@@ -86,13 +77,9 @@ export default function Home() {
       <main className="relative z-10">
         <HeroSection />
 
-        {/* 🟡 Products Section */}
         <section className="max-w-7xl mx-auto px-6 py-24">
           <header className="flex flex-col md:flex-row items-center md:items-end justify-between mb-16 gap-6">
             <div className="text-center md:text-right space-y-2">
-              {/* <div className="inline-block px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold mb-2">
-                SHOP THE COLLECTION
-              </div> */}
               <h2 className="text-4xl md:text-5xl font-black tracking-tight">
                 محصولات <span className="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">موجود</span>
               </h2>
@@ -100,14 +87,15 @@ export default function Home() {
             </div>
             
             <button 
-                onClick={() => router.push("/products")}
-
-              className="group flex items-center gap-2 bg-white/5 hover:bg-emerald-500 hover:text-white border border-white/10 transition-all duration-300 px-6 py-3 rounded-2xl font-bold text-sm">
+              onClick={() => router.push("/products")}
+              className="group flex items-center gap-2 bg-white/5 hover:bg-emerald-500 hover:text-white border border-white/10 transition-all duration-300 px-6 py-3 rounded-2xl font-bold text-sm"
+            >
               مشاهده همه کلکسیون
               <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
             </button>
           </header>
 
+          {/* استفاده از انیمیشن‌ها بدون ارور */}
           <motion.div 
             variants={containerVariants}
             initial="hidden"
@@ -123,12 +111,16 @@ export default function Home() {
           </motion.div>
         </section>
 
-        {/* ⚪️ Features Section (Refined) */}
         <section className="relative py-24">
           <div className="absolute inset-0 bg-white/[0.02] border-y border-white/5 shadow-inner" />
           <div className="relative max-w-7xl mx-auto px-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-              {FEATURES.map((feature, index) => (
+              {/* بخش ویژگی‌ها */}
+              {[
+                { title: "اصالت تضمینی", desc: "ارائه شناسنامه معتبر برای تمامی سنگ‌ها", icon: <Diamond className="text-emerald-400" size={32} /> },
+                { title: "ارسال اکسپرس", desc: "بسته‌بندی نفیس و ارسال در کمتر از ۴۸ ساعت", icon: <Truck className="text-emerald-400" size={32} /> },
+                { title: "ساخت سفارشی", desc: "تغییر دانه و منجوق طبق سلیقه شما", icon: <Hammer className="text-emerald-400" size={32} /> }
+              ].map((feature, index) => (
                 <motion.div 
                   key={index}
                   whileHover={{ y: -5 }}
