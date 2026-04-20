@@ -53,7 +53,7 @@ export default function Footer() {
             </p>
             
             {/* Social Icons */}
-            <div className="flex justify-end gap-4">
+            <div className="flex justify-start gap-4">
               {[
                 { icon: <FaInstagram size={20} />, href: "#" },
                 { icon: <FaXTwitter size={20} />, href: "#" },
@@ -176,12 +176,12 @@ export default function Footer() {
           {/* <p className="text-[12px] text-gray-500 font-medium" dir="rtl">
             © {currentYear} تمامی حقوق برای <span className="text-gray-300">تسبیح‌شاپ</span> محفوظ است. طراحی با ❤️ برای شما.
           </p> */}
-
+{/* 
           <div className="flex items-center gap-8 text-[12px] text-gray-500">
             <Link href="#" className="hover:text-white transition-colors">فرصت‌های شغلی</Link>
             <Link href="#" className="hover:text-white transition-colors">حریم خصوصی</Link>
             <Link href="#" className="hover:text-white transition-colors">نقشه سایت</Link>
-          </div>
+          </div> */}
 
         </div>
 

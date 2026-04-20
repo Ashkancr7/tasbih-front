@@ -76,7 +76,7 @@ export default function HeroSection() {
               animate={{ y: 0, opacity: 1 }}
               className="inline-flex items-center gap-2 bg-green-500/10 border border-green-500/20 px-4 py-2 rounded-full text-green-400 text-sm font-medium"
             >
-              <Sparkles size={16} />
+              {/* <Sparkles size={16} /> */}
               فروشگاه تخصصی تسبیح‌های سنگی و دست‌ساز
             </motion.div>
 
@@ -106,7 +106,7 @@ export default function HeroSection() {
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.3 }}
-              className="flex flex-wrap gap-4 justify-start lg:justify-start flex-row-reverse"
+              className="flex flex-wrap gap-4 justify-start lg:justify-start flex-row"
             >
               <button className="group relative bg-green-500 hover:bg-green-400 text-[#020617] font-bold px-8 py-4 rounded-2xl flex items-center gap-2 transition-all hover:shadow-[0_0_30px_rgba(34,197,94,0.4)] overflow-hidden">
                 <div className="absolute inset-0 w-1/4 h-full bg-white/20 skew-x-[45deg] -translate-x-full group-hover:translate-x-[400%] transition-transform duration-700"></div>
